@@ -28,6 +28,12 @@ io.on("connection", (socket) => {
         io.emit("getUsers", users);
     });
 
+    socket.on("roleChangeReq", (userId, role) => {
+        console.log(userId, role);
+        const user = getUser(userId);
+        io.to(user[0]?.socketId).emit("roleChanged", role);
+    });
+    
     socket.on("logoutAll", ({ userId }) => {
         const user = getUser(userId);
         for (let i = 0; i < user.length; i++) {
