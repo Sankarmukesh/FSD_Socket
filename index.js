@@ -45,9 +45,7 @@ io.on("connection", (socket) => {
     // socket.on when project assigned to group of users and we need to send notification to that added users
     socket.on("projectAssigned", (id, projectId, projectName) => {
         const user = getUser(id);
-        for (let i = 0; i < user.length; i++) {
-            io.to(user[i]?.socketId).emit("projectAssigned", { userId: id, projectId, projectName });
-        }
+            io.to(user[0]?.socketId).emit("projectAssigned", { userId: id, projectId, projectName });
     });
 
     //when disconnect
