@@ -1,0 +1,34 @@
+name: Deploy Socket Application
+
+on: 
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+      - name: Login to docker hub
+        run: docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}     
+      - name: Build Docker Image
+        run: docker build -t sankar712/fsd_socket  .
+      - name: Publish Image to docker hub
+        run: docker push sankar712/fsd_socket:latest 
+ 
+  deploy:
+          needs: build
+          runs-on: self-hosted 
+          steps:
+            - name: Pull image from docker hub
+              run: docker pull sankar712/fsd_socket:latest 
+            - name: Delete old container
+              run: docker rm -f fsd-socket-container  
+            - name: Run Docker Container
+              run: docker run -d -p 8900:8900 --name fsd-socket-container \
+                   -e DOCKER_USERNAME='${{ secrets.DOCKER_USERNAME }}' \
+                   -e DOCKER_PASSWORD='${{ secrets.DOCKER_PASSWORD }}' \
+                   sankar712/fsd_socket
+        
